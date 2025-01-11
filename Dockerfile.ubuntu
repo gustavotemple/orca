@@ -1,8 +1,22 @@
+# ./gradlew --no-daemon orca-web:installDist -x test
+# docker rmi orca
+# docker build -t orca -f Dockerfile.ubuntu .
+
 FROM ubuntu:bionic
 LABEL maintainer="sig-platform@spinnaker.io"
-RUN apt-get update && apt-get -y install openjdk-11-jre-headless wget
-RUN adduser --system --uid 10111 --group spinnaker
+RUN apt-get update && apt-get -y install openjdk-11-jdk openjdk-11-dbg wget
+
+USER root
+WORKDIR /root
+VOLUME /tmp
+VOLUME /root/async-profiler
+EXPOSE 8083
+
+#RUN adduser --system --uid 10111 --group spinnaker
 COPY orca-web/build/install/orca /opt/orca
-RUN mkdir -p /opt/orca/plugins && chown -R spinnaker:nogroup /opt/orca/plugins
-USER spinnaker
+#COPY . .
+#RUN ./gradlew clean build -x test
+RUN mkdir -p /opt/orca/plugins
+#USER spinnaker
 CMD ["/opt/orca/bin/orca"]
+#CMD ["./gradlew", "run"]

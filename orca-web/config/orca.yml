@@ -10,7 +10,8 @@ default:
 
 front50:
   enabled: true
-  baseUrl: ${services.front50.baseUrl:http://localhost:8080}
+  baseUrl: ${services.front50.baseUrl:http://front50:8080}
+  #baseUrl: ${services.front50.baseUrl:http://127.0.0.1:8080}
 tide:
   baseUrl: http://localhost:8090
 oort:
@@ -20,20 +21,57 @@ mort:
 kato:
   baseUrl: ${services.clouddriver.baseUrl:http://localhost:7002}
 echo:
-  enabled: true
+  enabled: false
   baseUrl: ${services.echo.baseUrl:http://localhost:8089}
 igor:
-  enabled: true
+  enabled: false
   baseUrl: ${services.igor.baseUrl:http://localhost:8088}
 bakery:
-  enabled: true
+  enabled: false
   baseUrl: ${services.rosco.baseUrl:http://localhost:8087}
 kayenta:
-  enabled: ${services.kayenta.enabled:false}
+  enabled: false
   baseUrl: ${services.kayenta.baseUrl:http://localhost:8090}
 
+services:
+  fiat:
+    enabled: false
+    baseUrl: http://localhost:7003
+
+executionRepository:
+  dual:
+    enabled: false
+    primaryName: sqlExecutionRepository
+    previousName: redisExecutionRepository
+  sql:
+    enabled: true
+  redis:
+    enabled: false
+
+sql:
+  enabled: true
+  cache:
+    enabled: false
+  connectionPools:
+    default:
+      # additional connection pool parameters are available here,
+      # for more detail and to view defaults, see:
+      # https://github.com/spinnaker/kork/blob/master/kork-sql/src/main/kotlin/com/netflix/spinnaker/kork/sql/config/ConnectionPoolProperties.kt
+      default: true
+      jdbcUrl: jdbc:mysql://mysql2:3306/orca?useSSL=false&useUnicode=true&characterEncoding=utf8
+      #jdbcUrl: jdbc:mysql://127.0.0.1:3306/orca?useSSL=false&useUnicode=true&characterEncoding=utf8
+      user: orca
+      password: orca
+      # password: depending on db auth and how spinnaker secrets are managed
+  migration:
+    user: orca
+    password: orca
+    jdbcUrl: jdbc:mysql://mysql2:3306/orca?useSSL=false&useUnicode=true&characterEncoding=utf8
+    #jdbcUrl: jdbc:mysql://127.0.0.1:3306/orca?useSSL=false&useUnicode=true&characterEncoding=utf8
+
 redis:
-  connection: ${services.redis.baseUrl:redis://localhost:6379}
+  connection: ${services.redis.baseUrl:redis://redis:6379}
+  #connection: ${services.redis.baseUrl:redis://127.0.0.1:6379}
 
 keiko:
   queue:
@@ -48,6 +86,14 @@ tasks:
 
 logging:
   config: classpath:logback-defaults.xml
+  level:
+    org:
+      apache:
+        http: DEBUG
+      springframework:
+        web:
+          client:
+            RestTemplate: DEBUG
 
 resilience4j.retry:
   instances:
@@ -60,6 +106,72 @@ resilience4j.retry:
     katoRetrofitServiceWriter:
       retryExceptions:
         - retrofit.RetrofitError
+
+swagger:
+  enabled: true
+  title: Orca API
+  description:
+  contact:
+  patterns:
+    - .*tasks.*
+    - .*auth.*
+    - .*applications.*
+    - .*securityGroups.*
+    - /search
+    - .*pipeline.*
+    - .*pipelineConfigs.*
+    - .*pipelines.*
+    - .*loadBalancers.*
+    - .*instances.*
+    - .*images.*
+    - .*elasticIps.*
+    - .*credentials.*
+    - .*events.*
+    - .*builds.*
+    - .*instanceTypes.*
+    - .*vpcs.*
+    - .*subnets.*
+    - .*networks.*
+    - .*bakery.*
+    - .*executions.*
+    - .*webhooks.*
+    - .*firewalls.*
+    - .*version.*
+    - .*pubsub.*
+    - .*projects.*
+    - .*functions.*
+    - .*managed.*
+    - .*plugins.*
+    - .*elasticIps.*
+    - .*cache.*
+    - .*instance.*
+    - .*search.*
+    - .*security.*
+    - .*vpcs.*
+    - .*credentials.*
+    - .*networks.*
+    - .*subnets.*
+    - .*ops.*
+    - .*task.*
+    - .*applications.*
+    - .*aws.*
+    - .*azure.*
+    - .*appengine.*
+    - .*gce.*
+    - .*kubernetes.*
+    - .*instances.*
+    - .*reports.*
+    - .*docker.*
+    - .*job.*
+    - .*process.*
+    - .*dcos.*
+    - /default/.*
+    - /credentials.*
+    - /global/.*
+    - /notifications.*
+    - /pipelines.*
+    - /strategies.*
+    - /v2/.*
 
 # This configuration lets you configure Webhook stages that will appear as native stages in the Deck UI.
 # Properties that are set here will not be displayed in the GUI

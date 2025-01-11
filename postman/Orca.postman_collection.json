@@ -1,0 +1,526 @@
+{
+	"info": {
+		"_postman_id": "701d3ece-9fe6-4bdb-9460-94d0f94151d1",
+		"name": "Orca",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "6978248"
+	},
+	"item": [
+		{
+			"name": "api-docs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}:8083/v2/api-docs",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"port": "8083",
+					"path": [
+						"v2",
+						"api-docs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create-pipeline",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Extrair o ID da resposta",
+							"const responseJson = pm.response.json();",
+							"const ref = responseJson.ref;",
+							"const id = ref.substring(ref.lastIndexOf('/') + 1);",
+							"",
+							"// Definir a variavel na coleção",
+							"pm.collectionVariables.set(\"pipeline\", id);",
+							"",
+							"pm.test(\"200 OK\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": \"{{pipelineConfigId}}\",\n    \"name\": \"pipeline-{{$randomInt}}\",\n    \"application\": \"{{application}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{url}}:8083/orchestrate",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"port": "8083",
+					"path": [
+						"orchestrate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "one-pipeline",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 OK\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}:8083/pipelines/:id",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"port": "8083",
+					"path": [
+						"pipelines",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{pipeline}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list-pipelines",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 OK\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://{{url}}:8083/pipelines?pipelineConfigIds={{pipelineConfigId}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"port": "8083",
+					"path": [
+						"pipelines"
+					],
+					"query": [
+						{
+							"key": "pipelineConfigIds",
+							"value": "{{pipelineConfigId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cancel-pipeline",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"202 OK\", function () {",
+							"  pm.response.to.have.status(202);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://{{url}}:8083/pipelines/:id/cancel?reason=reason-{{$randomInt}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"port": "8083",
+					"path": [
+						"pipelines",
+						":id",
+						"cancel"
+					],
+					"query": [
+						{
+							"key": "reason",
+							"value": "reason-{{$randomInt}}"
+						}
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{pipeline}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete-pipeline",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 OK\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://{{url}}:8083/pipelines/:id",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"port": "8083",
+					"path": [
+						"pipelines",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{pipeline}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create-task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Extrair o ID da resposta",
+							"const responseJson = pm.response.json();",
+							"const ref = responseJson.ref;",
+							"const id = ref.substring(ref.lastIndexOf('/') + 1);",
+							"",
+							"// Definir a variavel na coleção",
+							"pm.collectionVariables.set(\"task\", id);",
+							"",
+							"pm.test(\"200 OK\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/context+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"application\": \"{{application}}\",\n    \"description\": {\n        \"name\": \"task-{{$randomInt}}\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{url}}:8083/ops",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"port": "8083",
+					"path": [
+						"ops"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "one-task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 OK\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}:8083/tasks/:id",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"port": "8083",
+					"path": [
+						"tasks",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{task}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list-tasks",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 OK\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}:8083/tasks",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"port": "8083",
+					"path": [
+						"tasks"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cancel-task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"202 OK\", function () {",
+							"  pm.response.to.have.status(202);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://{{url}}:8083/tasks/:id/cancel",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"port": "8083",
+					"path": [
+						"tasks",
+						":id",
+						"cancel"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{task}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete-task",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 OK\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "accept",
+						"value": "*/*"
+					}
+				],
+				"url": {
+					"raw": "http://{{url}}:8083/tasks/:id",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"port": "8083",
+					"path": [
+						"tasks",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{task}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "url",
+			"value": "localhost"
+		},
+		{
+			"key": "application",
+			"value": "application-1",
+			"type": "string"
+		},
+		{
+			"key": "pipeline",
+			"value": "pipeline-1",
+			"type": "string"
+		},
+		{
+			"key": "task",
+			"value": "task-1",
+			"type": "string"
+		},
+		{
+			"key": "pipelineConfigId",
+			"value": "configId-1",
+			"type": "string"
+		}
+	]
+}
